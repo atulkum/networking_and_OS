@@ -1,0 +1,280 @@
+Title:  Writeup for Project 4: Distributed Amusement Ride, Summer 2008
+
+ Date:  07/31/08
+
+ Group Num 12 : Name            	Email            	Student ID
+                Amit Ashutosh          ashutosh@usc.edu         3200800108      
+                Atul Kumar             atulk@usc.edu            9150937306
+
+I. Requirements:
+	+ In the first part we have to implement the client functinality which work with single server
+	+ In the second part we need to implement multiple server with the client functionality from the first part.
+	
+II. Assumptions:
+		
+            + We changed the number of physical pages to 512 in machine.h
+            	#define NumPhysPages    512            	
+            + In case of any error condition we just print an error message and come out of that function.In any 
+            case we never abort from nachos.            
+            + Test cases for part 1 and 2 are same and must be compiled and run from the network directory.
+            + The client send the messages to the servers on a round robin fashion to help the testing of
+            multiple servers.            
+                        
+III. Design:
+	We have designed this using "full redundacy" design.Every server has all the information about the current state of
+	the ride.
+Client side design:
+	New system calls created are explained below:
+	For customer:
+		CGetInLine -- this sends a message to the server. The server select the minimum length line and send the
+			line numebr to the client.
+		CWaitForHelper -- the customer wait for the server signal, which is sent when a helper asks a customer to sit 
+			in a particular line.
+		CWaitForUnload -- the customer wait for the server signal to unload a car. The server sends this signal when 
+			ride is finished and unload request from the operator ahs arrived.
+		HRegister -- The helper sends a message to the server to register it with the server.
+		HWaitForCar -- The helper wait for a new car to load. The sever signal only when a request from operator comes 
+			for loading a new car.
+		HSeatCustomer -- The helper send a message to the server and request to sit a customer form the line.
+			if the customer is available and the car has space for the customer, the server respond with 0.
+			otherwise it respond with 1. After getting a 1 form the server the helper again go to wait for 
+			another car.
+		OStartRide -- the operator request the server to start a new ride.
+		OFinishRide -- the operator requests the server to finish and unload all the customer to unload.
+Server side design:
+	Here we maintain a timestamp table and a pending queue of message in the timestamp order. If a message arrive we send the message
+	to other servers after marking that the original server field of teh message.
+	If the message is coming form a server a acknowledgement is sent to the server whcih has sent the message.
+	After gettig the message the timestamp table is updated by the latest value of the timestamp field in the message.
+	
+	In acknowledge message the server sends it's own timestamp. After getting this ack, the srevers update the corresponding 
+	timestamp in their timestamp table.
+	
+	Now the server sees if there is any message in the pending message queue whcih has a timestamp older than the minimum timestamp
+	in the table.If it found the message it process it.
+	
+		
+IV. Implementation:
+
+            + Files Modified         
+            	In threads directory:
+            	thread.h
+            	system.h, system.cc
+            	main.cc
+            	list.h, list.cc
+            		 
+            	In userprog directory:
+            	addrspace.h, addrspace.cc
+            	exception.cc
+            	progtest.cc
+            	syscall.h            	            	
+            	
+            	In network directory:
+            	nettest.cc            	
+            	
+            + Files added  
+            	In test Directory:
+   		customer5.c
+   		customer3.c
+   		helper.c
+   		operator.c
+   
+            + Data Structures added, and the file they were added to.        					
+		system.h, system.cc :		
+			int serverId; -- server id ranges from 0 to 4. passed through command line as -server
+			int nServer; -- total numbe rof server passed from the command line as  -nserver
+			int netname; -- machine id, passed through the command line as -m
+
+		nettest.cc:
+			A message class whcih keeps information about a particular message.
+			class Message{ 
+				public:
+					int machineId;
+					int port;
+					time_t sec;  //second
+					time_t usec; //micro second
+					int type; //message type
+					int entity; //0-operator, 1- helper, 2- customer, 3 -Safety Inspector
+					int id;
+			};
+			
+		thread.h:
+		int mailBoxNo; -- mail box number for a particular thread.This is initialize at Exec and Fork system call
+			and in the StartProcess function.
+		list.h:
+		int size; -- to get the size of the list.
+    						
+            + Data Structures modified, and the file they were added to.
+		none
+		
+            + Functions added and in which file.	  		 
+            	*In userprog directory:
+        	exception.cc
+       			new system calls added are:
+       		
+       			CGetInLine_Syscall -- customer request for getting into a line
+       			CWaitForHelper_Syscall -- customer request for wait for an helper
+       			CWaitForUnload_Syscall -- customer request for wait for unload a car
+       			OStartRide_Syscall -- operator request for starting a ride
+       			OFinishRide_Syscall -- operator request for finishing a ride
+       			HWaitForCar_Syscall -- helper request for wait for a car
+       			HSeatCustomer_Syscall -- helper request for seating a customer
+       			HRegister_Syscall -- helper request for registration to the server
+       		
+        	*In network directory:	
+		nettest.cc
+			processMsg -- This method processes various messages from the clients. It will send the 
+			reply to the client if this server is the original getter of teh message.
+			
+			isBig -- this compare the time stamp of two messages
+			
+			List::SortedInsertTimeStamp -- this function is of class List. It inserts the messages in the list 
+			in the sorted order of the time stamp.
+			
+			serverPart2 -- this is the main server function which runs in infinite loop and wait 
+			for the message. after getting a message it synchronize it with other servers and process
+			the message.The steps are given below.
+			
+			while(true){
+				wait for message
+				after getting the message see the entity which sent the message
+				
+				if(entiry != SERVER){
+					insert the message in the pending message list using SortedInsertTimeStamp
+					and update the time stamp.
+					after this send this message to all other servers
+				}
+				else{
+					send the time stamp in the acknowledgement
+				}	
+				
+				in all cases update the time stamp with the latest value.
+				
+				get the earliest timestamp from my time stamp table
+				process(in timestamp order) any message in message queue, having time stamp stamp <= earliest timestamp
+			}
+			
+            + Functions modified and in which file.
+            	*In userprog directory:
+            	progtest.cc
+            		StartProcess() -- mailBoxNo value is assigned for the thread.
+            	
+            	exception.cc
+            		ExceptionHandler() -- new syscall handling code is added.
+            		
+            	*In thread directory:
+            	main.cc
+            		main(int argc, char **argv) -- code is added for starting the server using -server <id> -nserver <no of server>
+            		command line.            	            		            	            	
+            
+V. Testing:  (For each test case, you must show)
+
+            + How to test
+		In machine.h NumPhysPages should be 512.
+            	#define NumPhysPages    512
+		
+		Code must be compiled and run from the network directory.
+		Go to the network directory, where the script for running server and user program is there.
+		Run the following command to make these script executable.
+		
+		aludra.usc.edu(49): chmod +x server1
+		aludra.usc.edu(50): chmod +x server2
+		aludra.usc.edu(51): chmod +x server3
+		aludra.usc.edu(52): chmod +x customer5
+		aludra.usc.edu(53): chmod +x customer3
+		aludra.usc.edu(54): chmod +x helper
+		aludra.usc.edu(55): chmod +x operator
+		
+		After that run each script file on a separate terminal like this 
+		./serevr1 	
+		etc
+		
+		./server1, ./server2 and ./server3 must run before any script and ./operator must run after all the script has run.
+			
+            + Test Output
+            	server is running at machine id 230, 231, and 232 respectively.
+		Server output:			
+			****************Server (0,230) waiting for packets.***************
+			Got packet from (233, 3)
+			timestamp (1217587230, 666120) id 0
+			send msg to server (231, 0)
+			send msg to server (232, 0)
+			timestamp table (1217587230, 666120),(1217587230, 665466),(0, 0),(0, 0),(0, 0)
+			Min timestamp (0, 0).
+			****************Server (0,230) waiting for packets.***************
+			Got packet from (232, 0)
+			timestamp (1217587230, 666003) id 3
+			send ack to server (231, 0)
+			send ack to server (232, 0)
+			timestamp table (1217587230, 666120),(1217587230, 665466),(1217587230, 666003),(0, 0),(0, 0)
+			Min timestamp (1217587230, 665466).
+			Got request from Customer of type 0
+			customer waiting in line 0.
+			****************Server (0,230) waiting for packets.***************
+
+			Here after getting a message from customer (233, 3) [it represent (machine id, mailbox id)]
+			the server put the message in the pending queue and broadcast it to all other server. Thna it see 
+			the minimum time stamp from the timestamp table.The minimum timestamp is (0,0) [it represent (sec, usec)] 
+			so it doesn't process the message.
+			
+			After this the server reciev a message sent by the server (232,0) and update it's time stamp value.
+			Now it find a message in the pending queue which has a previous time stamp than the minimum timestamp in the
+			timestamp table so it process it and send the reply to the customer.
+			
+			****************Server (0,230) waiting for packets.***************
+			Got packet from (232, 0)
+			timestamp (1217587230, 666366) id 3
+			send ack to server (231, 0)
+			send ack to server (232, 0)
+			timestamp table (1217587230, 666366),(1217587230, 666241),(1217587230, 666366),(0, 0),(0, 0)
+			Min timestamp (1217587230, 666241).
+			Got request from Customer of type 0
+			customer (233, 3) waiting in line 2.
+			Got request from Customer of type 0
+			customer waiting in line 3.
+			****************Server (0,230) waiting for packets.***************
+										
+			Got request from Customer of type 0
+			customer (233, 3) waiting in line 2.
+			
+			these lines says that server (0, 230) is the original server whcih recieve the maessage from cuatomer (233,3)
+			so it is actully sending the the reply to the customer (233, 3). 
+
+			Got request from Customer of type 0
+			customer waiting in line 3.
+
+			these lines says that server (0, 230) is the not the original server whcih recieve the maessage.
+			It is only procesing the message but not sending any reply to the customer.
+
+		Customer output:
+			every customer display the following 3 message as per their status:
+			
+			Customer waiting for helper			
+			Seating in the car.      						
+			Unloading the car.       
+			
+		Helper output:
+			every helper display the following messages as per their status:
+		
+			Waiting for car.
+			Helper waiting for car
+			Got a new car to load.
+			Got a cust to load.   
+		Operator output:
+			every operator display the following messages as per their status:
+		
+			Operator starts ride.
+			Now Running.  
+			start Unloading.
+			Ride Finished.
+
+VI. Discussion:
+
+            + Experiment expectation.  
+            	We have done the experminet with one car , 8 customer, 2 helpers and for single ride. We used 3 servers.
+            + Experiment result.  
+		The simulation ends gracefully and Ride Finished message is printed for the operator.
+            + Explanation
+            	We successfully shown that nachos is able to run the roller coaster ride simulation in distributed environmnets.
+
+VII. Miscellaneous:

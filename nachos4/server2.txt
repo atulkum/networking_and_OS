@@ -1,0 +1,355 @@
+Total 3 servers
+****************Server (1,231) waiting for packets.***************
+Got packet from (233, 1)
+timestamp (1217587230, 665466) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (0, 0),(1217587230, 665466),(0, 0),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (233, 4)
+timestamp (1217587230, 666241) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (0, 0),(1217587230, 666241),(0, 0),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587230, 666003) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (0, 0),(1217587230, 666241),(1217587230, 666003),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587230, 666366) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (0, 0),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587230, 666366).
+timestamp table (0, 0),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587230, 666366).
+timestamp table (0, 0),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (0, 0).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587230, 665466).
+timestamp table (1217587230, 665466),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 665466).
+Got request from Customer of type 0
+customer (233, 1) waiting in line 0.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587230, 666120) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587230, 666120),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666120).
+Got request from Customer of type 0
+customer waiting in line 1.
+Got request from Customer of type 0
+customer waiting in line 2.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587230, 666120).
+timestamp table (1217587230, 666120),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666120).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587230, 666241).
+timestamp table (1217587230, 666241),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666241).
+Got request from Customer of type 0
+customer (233, 4) waiting in line 3.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587230, 666366).
+timestamp table (1217587230, 666366),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666366).
+Got request from Customer of type 0
+customer waiting in line 0.
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587230, 666366).
+timestamp table (1217587230, 666366),(1217587230, 666366),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666366).
+****************Server (1,231) waiting for packets.***************
+Got packet from (234, 1)
+timestamp (1217587247, 806783) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587230, 666366),(1217587247, 806783),(1217587230, 666366),(0, 0),(0, 0)
+Min timestamp (1217587230, 666366).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587247, 807038) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587230, 666366),(1217587247, 807038),(1217587247, 807038),(0, 0),(0, 0)
+Min timestamp (1217587230, 666366).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587247, 807038).
+timestamp table (1217587230, 666366),(1217587247, 807038),(1217587247, 807038),(0, 0),(0, 0)
+Min timestamp (1217587230, 666366).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587247, 807170) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587247, 807170),(1217587247, 807170),(1217587247, 807038),(0, 0),(0, 0)
+Min timestamp (1217587247, 807038).
+Got request from Customer of type 0
+customer (234, 1) waiting in line 1.
+Got request from Customer of type 0
+customer waiting in line 2.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587247, 807170).
+timestamp table (1217587247, 807170),(1217587247, 807170),(1217587247, 807038),(0, 0),(0, 0)
+Min timestamp (1217587247, 807038).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587247, 807170).
+timestamp table (1217587247, 807170),(1217587247, 807170),(1217587247, 807038),(0, 0),(0, 0)
+Min timestamp (1217587247, 807038).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587247, 807170).
+timestamp table (1217587247, 807170),(1217587247, 807170),(1217587247, 807170),(0, 0),(0, 0)
+Min timestamp (1217587247, 807170).
+Got request from Customer of type 0
+customer waiting in line 3.
+****************Server (1,231) waiting for packets.***************
+Got packet from (235, 1)
+timestamp (1217587261, 867365) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587247, 807170),(1217587261, 867365),(1217587247, 807170),(0, 0),(0, 0)
+Min timestamp (1217587247, 807170).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587261, 867365).
+timestamp table (1217587261, 867365),(1217587261, 867365),(1217587247, 807170),(0, 0),(0, 0)
+Min timestamp (1217587247, 807170).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587261, 867535) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587261, 867365),(1217587261, 867535),(1217587261, 867535),(0, 0),(0, 0)
+Min timestamp (1217587261, 867365).
+Got request from Helper of type 0
+helper (235, 1) registered.
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587261, 867535).
+timestamp table (1217587261, 867365),(1217587261, 867535),(1217587261, 867535),(0, 0),(0, 0)
+Min timestamp (1217587261, 867365).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587261, 867535).
+timestamp table (1217587261, 867535),(1217587261, 867535),(1217587261, 867535),(0, 0),(0, 0)
+Min timestamp (1217587261, 867535).
+Got request from Helper of type 0
+total 2 helper registered.
+****************Server (1,231) waiting for packets.***************
+Got packet from (236, 0)
+timestamp (1217587279, 23373) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587261, 867535),(1217587279, 23373),(1217587261, 867535),(0, 0),(0, 0)
+Min timestamp (1217587261, 867535).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587279, 23373).
+timestamp table (1217587261, 867535),(1217587279, 23373),(1217587279, 23373),(0, 0),(0, 0)
+Min timestamp (1217587261, 867535).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587279, 23373).
+timestamp table (1217587279, 23373),(1217587279, 23373),(1217587279, 23373),(0, 0),(0, 0)
+Min timestamp (1217587279, 23373).
+Got request from Operator of type 0
+operator (236, 0) registered.
+load signal to helper (235, 1)
+load signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587279, 482141) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587279, 482141),(1217587279, 482141),(1217587279, 23373),(0, 0),(0, 0)
+Min timestamp (1217587279, 23373).
+****************Server (1,231) waiting for packets.***************
+Got packet from (235, 2)
+timestamp (1217587279, 482365) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587279, 482141),(1217587279, 482365),(1217587279, 23373),(0, 0),(0, 0)
+Min timestamp (1217587279, 23373).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587279, 482365).
+timestamp table (1217587279, 482365),(1217587279, 482365),(1217587279, 23373),(0, 0),(0, 0)
+Min timestamp (1217587279, 23373).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587279, 482141).
+timestamp table (1217587279, 482365),(1217587279, 482365),(1217587279, 482141),(0, 0),(0, 0)
+Min timestamp (1217587279, 482141).
+Got request from Helper of type 1
+sit signal to customer (233, 1)
+customer seated signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587279, 482365).
+timestamp table (1217587279, 482365),(1217587279, 482365),(1217587279, 482365),(0, 0),(0, 0)
+Min timestamp (1217587279, 482365).
+Got request from Helper of type 1
+sit signal to customer.
+customer seated signal to helper (235, 2)
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587279, 651436) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587279, 482365),(1217587279, 651436),(1217587279, 651436),(0, 0),(0, 0)
+Min timestamp (1217587279, 482365).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587279, 651436).
+timestamp table (1217587279, 651436),(1217587279, 651436),(1217587279, 651436),(0, 0),(0, 0)
+Min timestamp (1217587279, 651436).
+Got request from Helper of type 1
+sit signal to customer.
+customer seated signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587279, 691436) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587279, 691436),(1217587279, 691436),(1217587279, 651436),(0, 0),(0, 0)
+Min timestamp (1217587279, 651436).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587279, 691436).
+timestamp table (1217587279, 691436),(1217587279, 691436),(1217587279, 691436),(0, 0),(0, 0)
+Min timestamp (1217587279, 691436).
+Got request from Helper of type 1
+sit signal to customer (234, 1)
+customer seated signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (235, 2)
+timestamp (1217587279, 891343) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587279, 691436),(1217587279, 891343),(1217587279, 691436),(0, 0),(0, 0)
+Min timestamp (1217587279, 691436).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587279, 891343).
+timestamp table (1217587279, 691436),(1217587279, 891343),(1217587279, 891343),(0, 0),(0, 0)
+Min timestamp (1217587279, 691436).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587279, 891343).
+timestamp table (1217587279, 891343),(1217587279, 891343),(1217587279, 891343),(0, 0),(0, 0)
+Min timestamp (1217587279, 891343).
+Got request from Helper of type 1
+sit signal to customer.
+customer seated signal to helper (235, 2)
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587280, 71294) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587279, 891343),(1217587280, 71294),(1217587280, 71294),(0, 0),(0, 0)
+Min timestamp (1217587279, 891343).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587280, 71478) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587280, 71478),(1217587280, 71478),(1217587280, 71294),(0, 0),(0, 0)
+Min timestamp (1217587280, 71294).
+Got request from Helper of type 1
+sit signal to customer.
+customer seated signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587280, 71478).
+timestamp table (1217587280, 71478),(1217587280, 71478),(1217587280, 71294),(0, 0),(0, 0)
+Min timestamp (1217587280, 71294).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587280, 71478).
+timestamp table (1217587280, 71478),(1217587280, 71478),(1217587280, 71478),(0, 0),(0, 0)
+Min timestamp (1217587280, 71478).
+Got request from Helper of type 1
+sit signal to customer (233, 4)
+customer seated signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (235, 2)
+timestamp (1217587280, 521312) id 0
+send msg to server (230, 0)
+send msg to server (232, 0)
+timestamp table (1217587280, 71478),(1217587280, 521312),(1217587280, 71478),(0, 0),(0, 0)
+Min timestamp (1217587280, 71478).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587280, 521512) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587280, 71478),(1217587280, 521512),(1217587280, 521512),(0, 0),(0, 0)
+Min timestamp (1217587280, 71478).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587280, 521512).
+timestamp table (1217587280, 71478),(1217587280, 521512),(1217587280, 521512),(0, 0),(0, 0)
+Min timestamp (1217587280, 71478).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587280, 521512).
+timestamp table (1217587280, 521512),(1217587280, 521512),(1217587280, 521512),(0, 0),(0, 0)
+Min timestamp (1217587280, 521512).
+Got request from Helper of type 1
+sit signal to customer.
+customer seated signal to helper (235, 2)
+Got request from Helper of type 1
+car loaded signal to helper.
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+Server rcvd an ack from (230, 0) with timestamp (1217587280, 521512).
+timestamp table (1217587280, 521512),(1217587280, 521512),(1217587280, 521512),(0, 0),(0, 0)
+Min timestamp (1217587280, 521512).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)
+timestamp (1217587280, 891317) id 1
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587280, 891317),(1217587280, 891317),(1217587280, 521512),(0, 0),(0, 0)
+Min timestamp (1217587280, 521512).
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+Server rcvd an ack from (232, 0) with timestamp (1217587280, 891317).
+timestamp table (1217587280, 891317),(1217587280, 891317),(1217587280, 891317),(0, 0),(0, 0)
+Min timestamp (1217587280, 891317).
+Got request from Helper of type 1
+car loaded signal to helper.
+ready to go operator (236, 0)
+****************Server (1,231) waiting for packets.***************
+Got packet from (232, 0)
+timestamp (1217587281, 281917) id 3
+send ack to server (230, 0)
+send ack to server (232, 0)
+timestamp table (1217587280, 891317),(1217587281, 281917),(1217587281, 281917),(0, 0),(0, 0)
+Min timestamp (1217587280, 891317).
+****************Server (1,231) waiting for packets.***************
+Got packet from (230, 0)

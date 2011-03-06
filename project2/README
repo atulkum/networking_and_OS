@@ -1,0 +1,25 @@
+* Compilation:
+
+The "make" command will compile all the files and make one executable mm2. 
+
+The "make clean" command would clean any files with prefix as *~ *.o *.bak and client, server and core files.
+
+
+*Assumptions:
+
+1) We are assuming that we don't have priviledge to run as root user.
+2) The TS filename accpted from the command line are not longer than 512.
+3) The maximum length of a line in the TS file is 80.
+4) Once the ctl-c has been pressed all the customers which are already there in the Q1 will depart from the system with a zero service time.
+5) If no customer comes and the ctl-c is pressed then, no statistics is printed.
+6) When ctl-c is pressed, the total sys time (theoritically) is calculated as given,
+
+queue time + service time(0 for all the customer waiting in queue)
+
+The customer which is being served is being served for it full time and only after that the server will exit.
+
+7) First customer will arrive after one inter arrival time has passed as per the example given in the specs.
+8) service time and arrival time is determined when the customer is created. It is as per the suggestion given in FAQ.So there is no mutex in GetInterval
+as only one thread always invoke this method.
+9) if rate is 0 the GetInterval will return 10000.
+10) There might be chances of overflow as the data type used is long double, and the values are stored in micros.

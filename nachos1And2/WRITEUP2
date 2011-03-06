@@ -1,0 +1,310 @@
+Title:  Writeup for Project 1: Thread Synchronization, Summer 2008
+
+ Date:  07/03/08
+
+ Group Num 12 : Name            	Email            	Student ID
+                Amit Ashutosh          ashutosh@usc.edu         3200800108      
+                Atul Kumar             atulk@usc.edu            9150937306
+
+I. Requirements:
+	+ In the first part we have to implement system call for monitor and lock  
+	+ In the second part we need to implement the multiprogramming with Exec, Fork, Exit and Yield system calls.
+	+ In the third part We have to run the roller coaster ride from the project 1 as a user program 
+		in multiprogramming environment.
+
+II. Assumptions:
+
+            + In case of any error condition we just print an error message and come out of that function.In any case we never 
+            abort from nachos.
+            + In exec and fork system calls if the number of physical pages is less than required, operating system aborts.
+            + We changed the number of physical pages to 512 in machine.h
+            	#define NumPhysPages    512
+            	
+            + The per process limit is as:
+            	*Maximum number of locks -- MaxLocks 32
+            	*Maximum number of conditions -- MaxConditions 32
+            	*Maximum number of stacks -- MaxThreads 16
+            + The argument passed to Exec and Fork should not be more than MAXFILENAME length long.
+            	#define MAXFILENAME 256
+            + The roller coaster ride is now run as a user program.              
+            
+III. Design:
+Lock and Condition system call:
+	We maintain a table which keep the lock(condition) objects with their id. User request any operation on the 
+	lock(condition) using the id. Using this id the lock(condition) object is find in the table and the requested 
+	operation is preformed. The user get this id as a result of calling Creat operation.
+Multiprogramming:
+	Nachos now support multiprogramming. The user program is run in a separate user memory space. The user program
+	is loaded into this memory space. This memory space is allocated to the user program page by page. A number of 
+	thread can also run in the same user space. Every thread is allocated its own stack space.	
+
+IV. Implementation:
+
+            + Files Modified         
+            	In threads directory:
+            	synch.h, synch.cc             		
+            		 
+            	In userprog directory:
+            	addrspace.h, addrspace.cc
+            	exception.cc
+            	progtest.cc
+            	syscall.h
+            	
+            	In test Directory:
+            	Makefile
+            	start.s
+            	
+            	In machine directory:
+            	machine.h  -- #define NumPhysPages    512
+            	
+            + Files added  
+            	test1.c
+            	test2.c
+            	test3.c
+            	test4.c
+            	test5.c
+		threadtest.c
+		
+            + Data Structures added, and the file they were added to.
+        	addrspace.h, addrspace.cc:
+        		*In AddressSpace class:
+        			->Table lockTable -- this keeps the mapping betwwen created locks and the lock ID.
+				->Table conditionTable -- this keeps the mapping betwwen created conditions and the condition ID.
+				->ProcessInfo pinfo -- this is the process information table.
+				->BitMap stacks -- this maintains the information about the empty stacks which could be assign to a new threads. 
+		system.h :
+		
+			extern BitMap* physicalMemPages;  -- the bitmap which store the status of physical.
+			extern Lock* phyMemLock; -- Lock which protects the physical memory access by different processes.
+			extern Condition* sysCond; -- condition which synchronize the exit of processes and their threads
+			extern Table* processesTable; -- table which maps the processes to their space id.
+    						
+            + Data Structures modified, and the file they were added to.
+		None.
+		
+            + Functions added and in which file.
+	  	*In threads directory:
+            	synch.h, synch.cc 
+            	
+            	->isWaiting() function is added in both Lock and Condition classes. This function checks
+            	if there is any thread is still waiting on this lock(condition). This function checks if the waiting queue of
+            	the lock(condition) is empty or not.
+            		 
+            	*In userprog directory:
+        	addrspace.h, addrspace.cc
+            	
+            	->copyPageByPage() -- This method copy the data section and code section page by page.
+            	
+            	->load() -- this method loads the user address space with the data and code section of nachos executable
+            		user program. It will return false if the file is not correct or there is not enough space in the
+            		memory.
+            		First it reads the executable files and calculate the number of pages required. Then it update the 
+            		page table and assign the physical memory pages to it.All the pages required for all the thread
+            		inside a process is allocated at the address sapce initialization.
+            		Code segment and init data segment are copied from the executable and space is allocated for
+            		stack and uninit data.
+            		
+            	->clearStack() -- This function clears the stack when a thread exit in a process.
+            	            	          
+            	exception.cc
+            	->readFromPhysicalMem() -- this method will read from the physical memory. machine->ReadMem() call will
+            	take care of the wrong virtual address passed and the out of address space addresses.
+            	The name passed whould be MAXFILENAME 256 length long.This is used in Fork and exec system calls.
+            	
+            	->Exec_Syscall() -- The steps for this system call are given below
+            	1) read the execuatble name using readFromPhysicalMem()
+            	2) create one address space 
+            	3) load the address space using load() method of the address space
+            	4) Initialize process id and space id.
+            	5) Write the space id into register 2.
+            	6) create a thread and fork it to execute exec_thread method.
+            	
+            	->exec_thread()  -- The steps for this method are given below
+            	1) restore state
+            	2) Initialize registers
+		3) call machine->Run();  	  
+			
+		->Fork_Syscall -- The steps for this system call are given below
+		1) create a new thread
+		2) assign the address space of the current thread to the created thread
+		3)fork the thread to execute kernel_thread method.
+		
+		->kernel_thread()  -- The steps for this method are given below
+		1) restore state
+		2) Initialize registers
+		3) write the virtual address passed to PCReg
+		3) call machine->Run();  	  
+		
+		->Exit_Syscall() -- We maintain 2 thread count, one per process thread count which count the
+		number of running threads in a process and the overall system thread count, which count the number
+		of overall running threads.
+		When the per process thread count reches zero than in Exit syscall the address space
+		of the process is deleted. When the overall thread count reaches zero, then interrupt->Halt();
+		is called.
+		
+		->Yield_Syscall() -- currentThread-> yield() function is called.
+		
+		->Acquire_Syscall(),Release_Syscall() -- Acquire and Release system calls for lock.
+			It first get the lock form the lock table using id passed as arguments. And then
+			calls the methods on the lock.In case of error return -1 to the user.
+		->CreateLock_Syscall() -- This method first create a Lock object and store them 
+			in the lock table. Then it returns the lock table id to the user.The 
+			user then access this lock using that id only.
+		->DestroyLock_Syscall() -- It first check if there is any thread waiting in queue
+			for the lock. If it is there it turn on the ready to destroy flag for this lock.
+			Otherwise it is deleted. In the Release system call this flags is checked and
+			if there is no thread waiting for the lock then it is destroyed.
+		
+		->Wait_Syscall(), Signal_Syscall(), Broadcast_Syscall() -- Wait, Broadcast and Signal 
+			system calls for condition.It first get the lock form the lock table using id 
+			passed as arguments. And then calls the methods on the condition.
+			In case of error return -1 to the user.
+		->CreateCondition_Syscall() -- This method first create a Condition object and store them 
+			in the condition table. Then it returns the condition table id to the user.The 
+			user then access this condition using that id only.
+		->DestroyCondition_Syscall() -- It first check if there is any thread waiting in queue
+			for the condition. If it is there it turn on the ready to destroy flag for this condition.
+			Otherwise it is deleted. In the Signal and broadcast system calls this flags is checked and
+			if there is no thread waiting for the condition then it is destroyed.
+		
+            + Functions modified and in which file.
+            	*In userprog directory:
+        	addrspace.h, addrspace.cc
+		->AddrSpace()  -- this method is now not doing much. All the functioning is moved to load method as
+			we want a return value in case of failure which is not possible in a constructor.
+		->~AddrSpace() -- This will now also release the physical memory pages which are assign to the process
+			page table.
+		->InitRegisters() --  In case of the Exec system call it will initialize all the registers as previously.
+			But in Fork system call it will initialize only the stack register. For that it will first get the
+			start address of the new stack assigned to the thread and put the stack address in stack register.
+			
+			machine->WriteRegister(StackReg, (numPages * PageSize - UserStackSize*si)- 16);
+		
+            	progtest.cc
+            	->StartProcess() -- this method now changed to resemble the Exec system call. It will start a new thread and execute
+            	the executable passed in that new thread. See the Exec system call for the detail.
+            	
+            	exception.cc
+            	->ExceptionHandler() -- handlers for new system calls are added.
+            	            	
+            
+V. Testing:  (For each test case, you must show)
+
+            + How to test
+
+		For testing part 1:
+			nachos -x "../test/test4" -rs <value>  -- test the lock and condition related system call.
+		For testing part 2:
+			nachos -x "../test/test1" -rs <value>  -- exec 2 processes(Exec("../test/testfiles")) and fork 2 thread
+			nachos -x "../test/test2" -rs <value>  -- try to Exec unlimited number of processes
+			nachos -x "../test/test3" -rs <value>  -- try to Fork unlimited number of threads
+		For testing part 3:
+			nachos -x "../test/threadtest" -rs <value>  -- Roller coaster ride using system calls
+			nachos -x "../test/test5" -rs <value>  -- 2 instances of roller coaster rides running simultaneously.
+			
+            + Test Output
+            For testing part 1:
+            	->nachos -x "../test/test4"            	
+		test4
+		waiting
+		Signaling
+		signaller wakeup
+		waiter wakeup
+
+		In test 4 first waiter is initialized and wait for a call from the signaller. After than signaller is initialize
+		and signal the waiter ot wake up after that all the lock and condition variables are destroyed. To ensure that 
+		signller wakes up after waiter, we used init lock.
+	    For testing part 2:
+		->nachos -x "../test/test1"	
+		In test1 Exec and Fork system calls are tested. First two exec call are made with argument "../test/testfiles" 
+		which writes "testing a write" on the console. After that fork is called with a function "test" which writes
+		testing a fork to the console.
+		
+		test1
+		testing a write
+		testing a write
+		testing a fork
+		testing a fork
+		
+		->nachos -x "../test/test2"
+		This test the maximum number of processes can be created with Exec system call.
+		
+		test2
+		testing a write
+		testing a write
+		ERROR: Number of pages requied(133) is more than the free physical memory pages available(114).
+		Assertion failed: line 192, file "../userprog/addrspace.cc"
+		Abort
+		It says after creating two processes the memory runs out and program abort.
+		
+		->nachos -x "../test/test3"
+		This test the maximum number of threads can be created with Fork system call.
+		
+		test3
+		testing a fork
+		testing a fork
+		testing a fork
+		testing a fork
+		testing a fork
+		testing a fork
+		testing a fork
+		testing a fork
+		Max thread reached.
+		Assertion failed: line 317, file "../userprog/exception.cc"
+		Abort
+
+		It says after creating a number of threads the memory runs out and program abort.
+	    
+	    For testing part 3:
+		->nachos -x "../test/threadtest"	
+		This test the roller coaster ride with one car. 
+		
+		ALL UNBOARD COND : ../test/threadtest2  ../test/threadtest6  ../test/threadtest3  ../test/threadtest7  ../test/threadtest4  ../test/threadtest8  ../test/threadtest5  ../test/threadtest9 
+		Now Running.  
+		start Unloading.
+		Car Unloaded.
+		Ride Finished.
+		No threads ready or runnable, and no pending interrupts.
+		Assuming the program completed.
+		Machine halting!
+
+		This shows that 8 passengers are loaded in the car and the car is unloaded successfully after 
+		the ride.
+	 
+	
+		->nachos -x "../test/test5"	
+		This runs 2 instances of the roller coaster ride with one car simultaneously using Exec system call.
+		
+		Car is loaded.
+		ALL UNBOARD COND : ../test/threadtest2  ../test/threadtest3  ../test/threadtest6  ../test/threadtest7  ../test/threadtest4  ../test/threadtest5  ../test/threadtest8  ../test/threadtest9 
+		Now Running.  
+		Car is loaded.
+		ALL UNBOARD COND : ../test/threadtest2  ../test/threadtest3  ../test/threadtest6  ../test/threadtest7  ../test/threadtest4  ../test/threadtest5  ../test/threadtest8  ../test/threadtest9 
+		Now Running.  
+		start Unloading.
+		start Unloading.
+		Car Unloaded.
+		Car Unloaded.
+		Ride Finished.
+		Ride Finished.
+		No threads ready or runnable, and no pending interrupts.
+		Assuming the program completed.
+		Machine halting!
+				
+
+VI. Discussion:
+
+            + Experiment expectation.  
+            		Lock and Condition system calls sould run correctly.
+            		Exec, Exit, Fork, and Yield system call should run correctly.
+            		Nachos should support multiprogramming.
+            + Experiment result.  
+			Various operations using Lock and Condition system calls are successfully tested.
+			Exec, Exit, Fork, and Yield are verified using various test cases.
+			Roller coaster ride successfully runs in the multiprogramming environment
+
+            + Explanation
+			Nachos now support multiprogramming. A user can now run user program using various system calls.
+			Synchronization is now supported using system calls.
+                        
+VII. Miscellaneous:

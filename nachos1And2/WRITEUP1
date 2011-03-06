@@ -1,0 +1,295 @@
+Title:  Writeup for Project 1: Thread Synchronization, Summer 2008
+
+ Date:  06/10/08
+
+ Group Num 12 : Name            	Email            	Student ID
+                Amit Ashutosh          ashutosh@usc.edu         3200800108      
+                Atul Kumar             atulk@usc.edu            9150937306
+
+I. Requirements:
+	+ As the first part we have to implement lock class 
+	+ In the second part we need to simulate 
+
+II. Assumptions:
+
+            + In case of any error condition we just print an error message and come out of that function.In any case we never 
+            abort from nachos.
+            
+            + In implementing the second part we use only conditional variable which was implemented in first part. 
+            Semaphore has not been used anywhere in the second part.
+            We have assumed the following things about the Roller Coaster simulation:
+            
+            First the operator fill up all the car one after another in order. All the car are then start running. After cars running completes, 
+            the operator unload the cars one by one in the same order in which the car has filled up.  This will complete one full ride.After 
+            then the new ride will start and it will go on like this till simulation ends or there is no customer in the line.
+            
+            We have assumed that all the customer will wait in the line and once they get into the car they will never return in the line.
+            
+            For safety inspector we have assumed that he will comes only after a car is fully loaded. He can't interrupt a single car loading.
+                        
+            
+III. Design:
+
+IV. Implementation:
+
+            + Files Modified            	
+            	synch.h, synch.cc             		
+            	main.cc 
+            	threadtest.cc
+            	list.h 
+
+            + Files added  
+            	None.
+
+            + Data Structures added, and the file they were added to.
+        	synch.h:
+        		In Lock class:  Thread *ownerThread; 
+					List *queue;  	
+			In Condition class:     Lock* conditionLock; 
+    						List *queue; 
+    						
+            + Data Structures modified, and the file they were added to.
+		None.
+		
+            + Functions added and in which file.
+		  class Lock                -- in file synch.cc/synch.h		
+		  {				               
+			void printWaiting();		
+                  }
+
+		  class Condition                -- in file synch.cc/synch.h		
+		  {				               
+			void printWaiting();		
+                  }
+                  
+		  class List                -- in file list.h		
+		  {				               
+			ListElement* getFirst(){return first;}		
+                  }
+		  -- in file threadtest.cc
+		  void Operator();
+		  void Customer();
+		  void Helper();
+		  SafetyInspector();
+		  void setup();
+		  void Problem2();
+		  void P2a();
+		  void P2b();
+		  void P2c();		  
+			
+            + Functions modified and in which file.
+		  class Lock                -- in file synch.cc/synch.h		
+		  {				               
+			void printWaiting();		
+                  }
+
+		  class Condition                -- in file synch.cc/synch.h		
+		  {				               
+			void printWaiting();		
+                  }                        
+		  -- in file main.cc
+		  
+		  int main(int argc, char **argv)
+            
+V. Testing:  (For each test case, you must show)
+
+            + How to test
+
+		For testing part 1 the command is -- nachos -T
+		Part 2 has 4 test cases, the commands for that is given below:
+		
+		nachos -P2A
+		nachos -P2B
+		nachos -P2C
+		nachos -P2FULL    
+
+			
+            + Test Output
+		(nachos -T) output:
+			In test 1 the thread  t1_t3 should not hold the lock t1_l1 which could be seen 
+			by the error message.
+			
+			t1_t3:ERROR:Lock t1_l1 is not held by the current threa.
+			
+			In test 2 the thread t2_t2 never wakes up after wait. So it is not completed.
+			
+			t2_t2: Lock t2_l1 acquired, waiting on t2_c1
+			
+			In test 3 only one thread is freed from the condition t3_c1.
+			
+			t3_waiter0: freed from t3_c1
+
+			In test 4 all the threads are freed from the condition t4_c1.
+			
+			t4_waiter0: freed from t4_c1
+			t4_waiter1: freed from t4_c1
+			t4_waiter2: freed from t4_c1
+			t4_waiter3: freed from t4_c1
+			t4_waiter4: freed from t4_c1
+			
+			Intest 5 t5_t1 never wakes up after wait.
+			
+			t5_t1: Lock t5_l1 acquired, waiting on t5_c1
+			
+		(nachos -P2A) output:
+
+			CUSTOMER1: Waiting in line 1
+			CUSTOMER2: Waiting in line 2
+			CUSTOMER3: Waiting in line 3
+			CUSTOMER4: Waiting in line 4
+			CUSTOMER5: Waiting in line 1
+			CUSTOMER6: Waiting in line 2
+			CUSTOMER7: Waiting in line 3
+			CUSTOMER8: Waiting in line 4
+			Customers in lines: 
+			LINE CONDITION1 : CUSTOMER1  CUSTOMER5 
+			LINE CONDITION2 : CUSTOMER2  CUSTOMER6 
+			LINE CONDITION3 : CUSTOMER3  CUSTOMER7 
+			LINE CONDITION4 : CUSTOMER4  CUSTOMER8 
+				
+			This test case shows the following:
+			1)Customers always take the shortest line, but no 2 Customers ever choose
+			the same shortest line at the same time
+				This could be seen by the order of the customer in line.								
+			2)Customers do not get into a Car until told to do so by a Helper
+				This is clearly visible form the above output. The customer are waiting for 
+			the helper signal to go into the car.				
+
+		(nachos -P2B) output:
+			This test case shows the following:			
+			1) No Customer can be told by two different Helpers to get into a Car
+				This can be seen from the following output. The customer 1 is served by the helper 1
+				aand customer 5 is served by the helper 2, which is clear from the order of 
+				execuation of the things.
+				
+				HELPER1: Reserved a seat in line 1, car 1.
+				HELPER1: Ask customer to sit in line 1, car 1.
+				HELPER2: Got a new car 1 to load.
+				HELPER2: Reserved a seat in line 1, car 1.
+				CUSTOMER1: Helper assign a seat in line 1, car 1
+				CUSTOMER1: Ask helper to fasten seat belt in line 1, car 1.
+				HELPER1: Seat belt fasten line 1, car 1.
+				HELPER1: Reserved a seat in line 2, car 1.
+				HELPER1: Ask customer to sit in line 2, car 1.
+				HELPER2: Ask customer to sit in line 1, car 1.
+				CUSTOMER2: Helper assign a seat in line 2, car 1
+				CUSTOMER2: Ask helper to fasten seat belt in line 2, car 1.
+				CUSTOMER5: Helper assign a seat in line 1, car 1
+				CUSTOMER5: Ask helper to fasten seat belt in line 1, car 1.
+				HELPER1: Seat belt fasten line 2, car 1.
+				HELPER1: Reserved a seat in line 2, car 1.
+				HELPER1: Ask customer to sit in line 2, car 1.
+				HELPER2: Seat belt fasten line 1, car 1.
+
+
+			2) Customers are never abandoned and left on cars - even if there is no
+			one waiting to get on another Car.
+				All the customers are safely unloaded from the car and no one is left
+				on the car. It can be seen from the following output at the end.
+				
+				CUSTOMER8: All Customers have unloaded the car 1
+				OPERATOR: Ride complete for the car 1.
+				CUSTOMER16: All Customers have unloaded the car 2
+				OPERATOR: Ride complete for the car 2.
+				CUSTOMER20: All Customers have unloaded the car 3
+				OPERATOR: Ride complete for the car 3.
+				OPERATOR: All Cars UnLoaded.
+				OPERATOR: Ride no 1 complete.
+
+			3) A Car is never sent out on the track until all Customer are safely loaded
+				This can be seen by the following out put.
+				
+				OPERATOR: All Cars loaded.
+				OPERATOR: Car 1 has 8 customers. Which are: 
+				ALL UNBOARD COND1 : CUSTOMER1  CUSTOMER2  CUSTOMER5  CUSTOMER6  CUSTOMER3  CUSTOMER4  CUSTOMER7  CUSTOMER8 
+				OPERATOR: Car 2 has 8 customers. Which are: 
+				ALL UNBOARD COND2 : CUSTOMER9  CUSTOMER10  CUSTOMER13  CUSTOMER14  CUSTOMER11  CUSTOMER12  CUSTOMER15  CUSTOMER16 
+				OPERATOR: Car 3 has 4 customers. Which are: 
+				ALL UNBOARD COND3 : CUSTOMER17  CUSTOMER18  CUSTOMER19  CUSTOMER20 
+				OPERATOR: Helpers loaded the cars, now running.
+				
+			4) Helpers don't tell Customers to load until the Operator tells them it is safe to do so.
+				This can be seen from the following output.Only after getting signal from the operator
+				both the helpers wakes up and reserve a seat.
+				
+				HELPER1: Waiting for car 1.
+				HELPER2: Waiting for car 1.
+				OPERATOR: Ride no 1 starts.
+				OPERATOR: Loading car 1, wakeup all helpers and wait till car is full.
+				HELPER1: Got a new car 1 to load.
+				HELPER1: Reserved a seat in line 1, car 1.
+				HELPER1: Ask customer to sit in line 1, car 1.
+				HELPER2: Got a new car 1 to load.
+				HELPER2: Reserved a seat in line 1, car 1.
+			5) No Car is unloaded until the just-loaded Car has left the loading area.
+				This is shown by the following output.
+				
+				OPERATOR: All Cars loaded.
+				OPERATOR: Car 1 has 8 customers. Which are: 
+				ALL UNBOARD COND1 : CUSTOMER1  CUSTOMER2  CUSTOMER5  CUSTOMER6  CUSTOMER3  CUSTOMER4  CUSTOMER7  CUSTOMER8 
+				OPERATOR: Car 2 has 8 customers. Which are: 
+				ALL UNBOARD COND2 : CUSTOMER9  CUSTOMER10  CUSTOMER13  CUSTOMER14  CUSTOMER11  CUSTOMER12  CUSTOMER15  CUSTOMER16 
+				OPERATOR: Car 3 has 4 customers. Which are: 
+				ALL UNBOARD COND3 : CUSTOMER17  CUSTOMER18  CUSTOMER19  CUSTOMER20 
+				OPERATOR: Helpers loaded the cars, now running.
+				CUSTOMER8: All Customers have unloaded the car 1
+				OPERATOR: Ride complete for the car 1.
+				CUSTOMER16: All Customers have unloaded the car 2
+				OPERATOR: Ride complete for the car 2.
+				CUSTOMER20: All Customers have unloaded the car 3
+				OPERATOR: Ride complete for the car 3.
+				OPERATOR: All Cars UnLoaded.
+				OPERATOR: Ride no 1 complete.
+			
+			
+			6) Customers never exit a Car until told to do so by the Operator.
+				This can be seen from the follwoing output. The customer unboard only after getting
+				the signal from the operator.
+				
+				CUSTOMER8: All Customers have unloaded the car 1
+				OPERATOR: Ride complete for the car 1.
+				CUSTOMER16: All Customers have unloaded the car 2
+				OPERATOR: Ride complete for the car 2.
+				CUSTOMER20: All Customers have unloaded the car 3
+		(nachos -P2B) output:
+			This test case shows the following:			
+			1)No Cars are loaded when a Safety Inspector decides a ride is unsafe
+			AND all Customers on the ride are allowed to get out of the Car they are in.
+			
+				This can be easily seen by the output:
+				
+				SAFETY INSPECTOR: Safety Inspector is initialized.
+				 It will wake up in 1 ride, after 1 car has been loaded.
+				
+				and
+				
+				OPERATOR: Safety Inspector came in, unloading the cars.
+				OPERATOR: Car 1 has 8 customers. Which are: 
+				ALL UNBOARD COND1 : CUSTOMER1  CUSTOMER2  CUSTOMER5  CUSTOMER6  CUSTOMER3  CUSTOMER4  CUSTOMER7  CUSTOMER8 
+				CUSTOMER8: All Customers have unloaded the car 1
+				OPERATOR: All Cars UnLoaded.
+				SAFETY INSPECTOR: Safety Inspector is fixing the problem.
+				SAFETY INSPECTOR: Safety Inspector has fixed the problem.
+				OPERATOR: Safety Inspector fixed the problem. Next ride is ready to go
+		
+VI. Discussion:
+
+            + Experiment expectation.  
+            		The number of rides will run successfully without any deadlock with various rs commmands. 
+            		In case of less number of customers the ride will stop after loading and unloading all the
+            		customers.
+
+            + Experiment result.  
+            		The rides are completed successfully. When the number of customers are less the ride completes
+            		after loading and unloading the number of customers.The run with various rs command parameter
+            		are also successful.
+
+            + Explanation
+			The simulation is supposed to be complete in the multitasking environment. Here many threads
+			are running simultaneously and using rs command line we put various yield() at many places,
+			which make the nachos as a multi tasking machine. 
+			If the simulation runs in that condition that means it is free of race condition and it is
+			doing synchronization and locking properly and there is no deadlock.
+			
+                        
+VII. Miscellaneous:

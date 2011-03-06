@@ -1,0 +1,54 @@
+Helpers.
+EXIT CODE : 0
+Thread with mailbox number 0 exiting.
+sending packet to (231, 0)
+sending packet to (232, 0)
+Waiting for car.
+Helper waiting for car
+Waiting for car.
+Helper waiting for car
+Got packet from (231, 0)
+Got a new car to load.
+Got a cust to load.   
+sending packet to (230, 0)
+Got packet from (232, 0)
+Got a new car to load.
+Got a cust to load.   
+sending packet to (231, 0)
+Got packet from (231, 0)
+Got 0
+Got a cust to load.   
+sending packet to (232, 0)
+Got packet from (230, 0)
+Got 0
+Got a cust to load.   
+sending packet to (230, 0)
+Got packet from (232, 0)
+Got 0
+Got a cust to load.   
+sending packet to (231, 0)
+Got packet from (230, 0)
+Got 0
+Got a cust to load.   
+sending packet to (232, 0)
+Got packet from (231, 0)
+Got 0
+Got a cust to load.   
+sending packet to (230, 0)
+Got packet from (230, 0)
+Got 0
+Got a cust to load.   
+sending packet to (231, 0)
+Got packet from (232, 0)
+Got 0
+Got a cust to load.   
+sending packet to (232, 0)
+Got packet from (231, 0)
+Got 0
+Got a cust to load.   
+sending packet to (230, 0)
+Got packet from (232, 0)
+Got 1
+Waiting for car.
+Helper waiting for car
+Got packet from (230, 0)

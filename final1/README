@@ -1,0 +1,16 @@
+* Compilation:
+
+The "make" command will compile all the file separately and link them into "sv_node" executable. 
+You need to run "make" at the command prompt.
+
+The "make clean" command would clean any files with prefix as *~ *.o *.bak and sv_node and core files.
+
+
+*Assumptions:
+
+1) We are assuming that we don't have priviledge to run as root user so resreved port numbers(<1024) is not allowed.	
+2) The server will listen() with the number of outstanding connections in the socket's listen queue as 5	
+3) When a number of regular nodes connect to the neighbors, the connectivity may be different between two runs.
+4) The passed filename would always end with .ini.
+5) We are assuming that none of the packets would be more than 512 bytes.
+6) We are assuming that UOID is an "unsigned char" type.  

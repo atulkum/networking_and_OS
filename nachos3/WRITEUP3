@@ -1,0 +1,397 @@
+Title:  Writeup for Project 1: Thread Synchronization, Summer 2008
+
+ Date:  07/20/08
+
+ Group Num 12 : Name            	Email            	Student ID
+                Amit Ashutosh          ashutosh@usc.edu         3200800108      
+                Atul Kumar             atulk@usc.edu            9150937306
+
+I. Requirements:
+	+ In the first part we have to implement TLB cache.
+	+ In the second part we need to implement the virtual memory with inverted page table.
+	+ In the third part we have to implement distributed Lock and Conditional variables.
+
+II. Assumptions:
+
+            + In case of any error condition we just print an error message and come out of that function.In any case we never 
+            abort from nachos.
+            + We are using a file named "SWAP" for storing swap memory.
+            + We changed the number of physical pages to 32 in machine.h
+            	#define NumPhysPages    32
+            + Test cases for part 1 and 2 must be compiled and run from the vm directory.
+            + Test cases for part 3 must be compiled and run from the network directory.
+            + For part 3 server always runs with "-m 0" command line option.As the machine id is 
+            harcoded in every client.
+                        
+III. Design:
+TLB and virtual memory system:
+We have implemented the TLB functionality in part one. For this we handle the "PageFaultException" inthe method ExceptionHandler 
+in the file exception.cc. The steps are describe below:
+step 1) Read the virtial page number(vpn) from "BadVAddrReg" and validate it.
+step 2) Search in the IPT by the vpn and space id of the current thread.
+step 3) If an ipt entry found go to step 10.
+step 4) Try to find an empty location in IPT (size of IPT is equal to NumPhysPages)
+step 5) If found go to step 10.
+step 6) Search an IPT page entry to evict. Evication policy could be Random or FIFO as
+specified at the command line using -P option.In case of Random we randomly select an IPT 
+entry to evict. In case of FIFO we select the next entry in the IPT which comes earlier.
+We don't evict the pages which are present in the TLB.
+step 7) Write the evicted page to swap file if the page is of type uninit data or stack data or mix and it's dirty field is set.
+step 8) Read the page into memory form the executable file if the page is of type code or init Data, else read from the swap file
+if it is already written there.
+step 9) update the page table and IPT.
+step 10) update the TLB entry.
+
+The following major design changes has been done:
+-No preloading of memory pages is done in the AddressSpace::load method.
+-Now the executable file is not closed at the time of loading the program and it is kept open, so that
+later it could be used to read the code when a code page is loded into the memory.
+-An inverted page table is maintained in the kernel. This page table contain the account of free pages
+in the physical memory and maps it to the virtual memory pages of an address sapce page table.
+-At the time of evicting a page we check for the page to be evicted in the TLB. If it's there in the TLB 
+than we does not evict that page.
+
+Distributed Lock and Condition Variable:
+
+A single threaded centralized server now manage all the locks and condition variables.Whenever a client
+wants to create a lock or CV it send a message to the server. The server create the lock or CV and send
+the id back to the client.
+
+For acquiring a lock, the client send the request to server and wait for the server reply.As a Receive()
+call is blocking the client is blocked and hence the sleep in acquire is implemented.
+
+For release , signal, braodcast and destroy the client send the message to the server and server
+handle the call.
+
+For wait the client send the message to the server, ther server release the lock and put the client reply 
+in the wait queue. Meanwhile cleint is waiting on the Receive() call.When the server recieve a signal, it 
+wakes up the client by sending the reply. After this the client wait for the lock to be acquired.
+
+
+IV. Implementation:
+
+            + Files Modified         
+            	In threads directory:
+            	system.h, system.cc
+            	main.cc
+            		 
+            	In userprog directory:
+            	addrspace.h, addrspace.cc
+            	exception.cc
+            	progtest.cc            	
+            	
+            	In test Directory:
+            	Makefile
+            	
+            	In network directory:
+            	nettest.cc
+            	Makefile
+            	
+            + Files added  
+            	In test Directory:
+            	test1.c
+            	test2.c
+            	test3.c
+            	test4.c            	
+		
+            + Data Structures added, and the file they were added to.
+        	addrspace.h, addrspace.cc:
+        		class TranslationEntryPT: public TranslationEntry{ -- Translation entry class for address space page table entries.
+				public:
+					int pageType; //0 = swapdata, 1 = code+initdata, 2 = mixed
+					int dataSize; 
+					int exelocation; -- location on the executable file(valid for code and init data)
+ 					int swaplocation; -- location on the swap file(valid for stack and uninit data)
+			};
+
+        		*In AddressSpace class:
+        			OpenFile *executable; -- File pointer for the executable file.
+				
+		system.h, system.cc :		
+			extern BitMap* swapPages; -- bit map for free pages in the swap space, size is NumPhysPages*2
+			extern BitMap* IPTPages; -- bit map for free IPT pages, size is NumPhysPages
+			extern unsigned int tblLocation; -- next tlb location counter
+			extern unsigned int fifoIptLocation; -- next fifo loaction in the IPT. this is used in FIFO page
+				replacement policy.
+			class TranslationEntryIPT: public TranslationEntry{ -- Translation entry class for IPT entries.
+				public:
+					int spaceId;
+			};
+			extern TranslationEntryIPT* ipt; -- invertable page table
+			extern OpenFile *swapFile; -- swap file pointer.We initialize it in the Initialize function of system.cc
+			extern bool RAND_OR_FIFO; -- decide which page replacement method is used.
+
+		nettest.cc:
+
+			typedef struct distributedLock{
+				char name[256];
+				int queue[256][2];
+				int queueSize;
+				bool marked4Deletion;
+				int owner;
+			}DistributedLock;  -- data structure for distributed locks
+
+			DistributedLock locks[256];  -- table to store distributed locks
+			BitMap lockIds(256); -- bitmap for distributed locks
+
+			typedef struct distributedCondition{ 
+				char name[256];
+				int queue[256][2];
+				int queueSize;
+				bool marked4Deletion;
+				int lock;
+			}DistributedCondition; -- data structure for distributed conditions
+
+			DistributedCondition conditions[256]; -- table to store distributed conditions
+			BitMap conditionIds(256); -- bitmap for distributed conditions	
+    						
+            + Data Structures modified, and the file they were added to.
+		system.h, system.cc :
+			pageTable is now having the type TranslationEntryPT instead of TranslationEntry.
+		
+            + Functions added and in which file.	  		 
+            	*In userprog directory:
+        	addrspace.h, addrspace.cc
+            		void pageTableFillup(int fileStart, int len); -- It will now assign the page type (0 - for swap type,
+            			1- for exe type, 2- for mix type), and file location of that page for every page in the 
+            			address space page table.
+			bool readExe(int ppn, int vpn); -- Function for reading one page from executable file into physical memory
+			bool readSwap(int ppn, int vpn); -- Function for reading one page from swap file into physical memory
+			bool readMix(int ppn, int vpn); -- Function for reading one mix page from executable and swap file into physical memory
+
+			bool writeSwap(int ppn, int vpn);-- Function for writing one page from physical memory to swap file.
+			bool writeMix(int ppn, int vpn);--Function for writing one mixed page from physical memory to swap file.
+
+			bool writeBack(int ppn, int vpn); --Function for writing back one page from physical memory.
+			bool readFrom(int ppn, int vpn); -- Function for reading one page into physical memory           	            	          
+		*In network directory:	
+		nettest.cc
+			void server(); -- This is the function for server running in the kernel mode.
+			Below is the description of the function is given:
+				while(true){
+					set some value
+					postoffice->Receive(.....);
+					get & parse the request type //9 different type of request
+					first piece of the data in the msg is request type 
+					same size for all request -- 2 bytes
+
+					then go to the function haldler for each type 
+						-- parse rest of message
+						-- create reply msg
+
+					If appropriate, send the reply msg OR queue it for later transmission
+				}
+		
+            + Functions modified and in which file.
+            	*In userprog directory:
+        	addrspace.h, addrspace.cc
+        		SaveState() -- In this function now all the TLB entries are invalidated. This will invalidate the 
+        		tlb entries for current thread address space at the context switch time.
+        		RestoreState() -- Now the pageTable assignment to machine->pageTable is removed.  
+        		load() -- The preloading of physical pages in physical memory is removed.
+	    	progtest.cc
+            		StartProcess() -- The executable file is not closed in this method now. It is now assigned to
+            			space->executable.
+            	
+            	exception.cc
+            		ExceptionHandler() -- PageFaultException handling code is added at the end.
+            		
+            		Under the NETWORK directive, the functionality
+            		for working with distributed lock and condition variables are added.
+            		
+            		Acquire_Syscall() -- Now for acuiring a lock, a message is sent to the server with lock id.
+            			and wait for the reply.
+            		Release_Syscall() -- For relasing a message is sent to the server with lock id.            			
+			CreateLock_Syscall() -- A message is sent to the server with the name of the lock.
+				The server reply with the lock id of the created lock.
+			DestroyLock_Syscall() -- For destroying a message is sent to the server with lock id.
+			
+			Wait_Syscall() -- A message with the condition id and lock id is sent to the server.
+				server first relase the lock and put the requesting client in the wait queue.
+				When the requesting client get the signal to wakeup, it send an acquire message
+				to server with it's lock id.
+			Signal_Syscall() -- It send a message to the server with the lock id and condition id.
+				The server wake up one waiting thread.
+			Broadcast_Syscall() -- It send a message to the server with the laock id and condition id.
+				The server wake up all the waiting threads.
+			CreateCondition_Syscall() -- A message is sent to the server with the name of the condition.
+				The server reply with the condition id of the created condition.
+			DestroyCondition_Syscall() -- For destroying a message is sent to the server with condition id.
+			
+            	*In thread directory:
+            	main.cc
+            		main(int argc, char **argv) -- code is added for starting the server for distributed lock and 
+            		condition variable.
+            	            	
+            
+V. Testing:  (For each test case, you must show)
+
+            + How to test
+		In machine.h NumPhysPages should be 32.
+            	#define NumPhysPages    32
+		
+		For testing part 1 and 2: Must be compiled and run from the vm directory
+			nachos -x "../test/sort" -P <RAND|FIFO> -rs <value>   -- runs sorting test case from sort.c
+			nachos -x "../test/matmult"-P <RAND|FIFO> -rs <value> -- runs matrix multiplication test case from matmult.c
+			nachos -x "../test/test1" -P <RAND|FIFO> -rs <value>  -- try to Exec 2 insatnces of sort and run simultaneouly.
+			nachos -x "../test/test2" -P <RAND|FIFO> -rs <value>  -- try to Fork 2 insatnces of sort and run simultaneouly.
+
+		For testing part 3: Must compiled and run from the network directory
+			Run these commands from 3 different terminals
+			
+			nachos -server -m 0  -- Server must start with -m 0 before any of the test cases.
+			nachos -x "../test/test3" -m 1  -- this must start with -m 1, before test 4.
+			nachos -x "../test/test4" -m 2  -- this must start with -m 2, after test 3.
+			
+			After running these, for shutting down one has to use "control-c" as the program
+			doesnot terminate automatically becasue postal service is still running.
+			
+			test3 acuire the lock and wait for a signal, while the test4 acquire the lock and signal.
+			server handle the distributed locks and condition variables.
+			
+            + Test Output
+            For testing part 1 and 2:
+            	nachos -x "../test/sort" -P <RAND|FIFO>  
+            		EXIT CODE: 1023            		
+            		
+            		The sort test case prints the exit code.
+            	nachos -x "../test/matmult"-P <RAND|FIFO>
+            		EXIT CODE: 7220
+            		
+            		The matmult test case prints the exit code.
+            	nachos -x "../test/test1" -P <RAND|FIFO>
+            		
+            		EXIT CODE: 1023
+            		EXIT CODE: 1023
+            		
+            		Two execs are run like this.
+				Exec("../test/sort");
+				Exec("../test/sort");			
+			Both exec calls the sort and print the exit code.
+            	nachos -x "../test/test2" -P <RAND|FIFO>
+			
+            		EXIT CODE: 127
+            		EXIT CODE: 511
+        		
+        		Two forks with array of length 128 and 512 is run like this.
+        		Fork(sort1);
+			Fork(sort2);    		
+			The first exit code is printed by sort1 and the second one is by sort2.
+			
+            For testing part 3:
+		Server:
+						aludra.usc.edu(34): nachos -server -m 0
+
+
+						request type 1
+						server:create lock LOCK 
+						server: lock created 0 LOCK 
+
+						request type 5
+						server:create condition COND 
+						server: condition created 0 COND 
+
+						request type 2
+						server: acquire lock 0
+						server:lock acuired.0
+
+						request type 7
+						server: wait on condition 0 with lock 0
+
+						request type 1
+						server:create lock LOCK 
+						server: lock created 0 LOCK 
+
+						request type 5
+						server:create condition COND 
+						server: condition created 0 COND 
+
+						request type 2
+						server: acquire lock 0
+						server:lock acuired.0
+
+						request type 8
+						server: signal on condition 0 with lock 0
+						server: signalled 1
+
+						request type 3
+						server: release lock 0
+
+						request type 2
+						server: acquire lock 0
+						server:lock acuired.0
+
+						request type 3
+						server: release lock 0
+
+						request type 4
+						server: destroy lock 0
+
+						request type 6
+						server: destroy condition 0
+			Server handles all the requests from both the cleint.
+
+		Test3				aludra.usc.edu(3): nachos -x "../test/test3" -m 1
+						test3
+						client: creat lock LOCK
+						Got packet from 0, box 0
+						client: created lock LOCK id 0
+						client: create condition COND 
+						Got packet from 0, box 0
+						client: condition created 0
+						client: acuire lock 0
+						Got packet from 0, box 0
+						client: lock acuired 0
+						client: wait condition 0 lock 0
+						Got packet from 0, box 0
+						client: wait signalled 0 lock 0
+						client: in wait acuire lock 0
+						Got packet from 0, box 0
+						client: in wait lock acuired 0
+						client: release lock  0
+						client: destroy lock 0
+						client: destroy condition 0
+			This test case creates a lock named "LOCK",and a condition variable "COND" acuqire the lock 
+			and wait for the signal. After recieving the signal it wakes up and release the lock.
+		
+
+		Test4				aludra.usc.edu(4): nachos -x "../test/test4" -m 2
+						test4
+						client: creat lock LOCK
+						Got packet from 0, box 0
+						client: created lock LOCK id 0
+						client: create condition COND 
+						Got packet from 0, box 0
+						client: condition created 0
+						client: acuire lock 0
+						Got packet from 0, box 0
+						client: lock acuired 0
+						client: signal condition 0 lock 0
+						client: release lock  0
+			This test case creates a lock named "LOCK",and a condition variable "COND" acuqire the lock 
+			signal and release the lock. 
+
+
+VI. Discussion:
+
+            + Experiment expectation.  
+            	part 1 and 2:
+            		We tried to run the test cases which casuses a lot of TLB and IPT page miss.We run these test cases 
+            		using fork and execute also.
+            	part 3:
+            		We tried to run a test case with mutual exclusion and synchronization with distributed locks and
+            		condition variables.
+            + Experiment result.  
+		part 1 and 2:
+			We successfully run those test cases with various -rs values. We can see a lot of TLB and IPT page misses 
+			happening and still the test cases give the correct exit code.
+		part 3:
+			The test case runs successfully with the server.
+
+            + Explanation
+		part 1 and 2:                        
+			Nachos now contain virtual memory. Now the user programs gets virtually infinite memory.
+		part 3:
+			Nachos now has distributed locks and condition variable implemented. Now a single threaded.
+			centralized server manage the locks and condition variables.
+VII. Miscellaneous:

@@ -1,0 +1,14 @@
+* Compilation:
+
+The "make" command will compile both client and server. Optionally you can also issue
+"make client" for compiling client and "make server" for compiling server
+
+The "make clean" command would clean any files with prefix as *~ *.o *.bak and client, server and core files.
+
+
+*Assumptions:
+
+1)We are assuming that we don't have priviledge to run as root user so resreved port numbers(<1024) is not allowed.	
+2) the server will listen() with the number of outstanding connections in the socket's listen queue as 5	
+3) If server recieve a data length longer than 512 than it will send all fail message.
+4) A client will not accept data value with longer than 512 from the command line.

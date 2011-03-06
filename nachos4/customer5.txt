@@ -1,0 +1,55 @@
+5 Customers.
+EXIT CODE : 0
+Thread with mailbox number 0 exiting.
+Customer waiting in line.
+sending packet to (231, 0)
+Customer waiting in line.
+sending packet to (232, 0)
+Customer waiting in line.
+sending packet to (230, 0)
+Customer waiting in line.
+sending packet to (231, 0)
+Customer waiting in line.
+sending packet to (232, 0)
+Got packet from (231, 0)
+Customer waiting in line 0
+Customer waiting for helper
+Got packet from (230, 0)
+Customer waiting in line 2
+Customer waiting for helper
+Got packet from (231, 0)
+Customer waiting in line 3
+Customer waiting for helper
+Got packet from (232, 0)
+Customer waiting in line 1
+Customer waiting for helper
+Got packet from (232, 0)
+Customer waiting in line 0
+Customer waiting for helper
+Got packet from (232, 0)
+Seating in the car.      
+Got packet from (231, 0)
+Seating in the car.      
+Got packet from (232, 0)
+Seating in the car.      
+Got packet from (230, 0)
+Seating in the car.      
+Got packet from (231, 0)
+Seating in the car.      
+Got packet from (230, 0)
+Unloading the car.       
+EXIT CODE : 0
+Thread with mailbox number 3 exiting.
+Got packet from (231, 0)
+Unloading the car.       
+EXIT CODE : 0
+Thread with mailbox number 1 exiting.
+Got packet from (231, 0)
+Unloading the car.       
+EXIT CODE : 0
+Thread with mailbox number 4 exiting.
+Got packet from (232, 0)
+Unloading the car.       
+EXIT CODE : 0
+Thread with mailbox number 5 exiting.
+Got packet from (232, 0)
